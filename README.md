@@ -5,5 +5,5 @@ https://ci.appveyor.com/project/madivira/ahj-events2
 
 >GitPages 
 >
-https://madivira.github.io/ahj-event-events2/
+https://madivira.github.io/ahj-events2/
 > 
