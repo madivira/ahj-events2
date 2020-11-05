@@ -9,28 +9,32 @@ const labelArr = [];
 
 formInput.addEventListener('input', (e) => { // поиск по всем задачам
   e.preventDefault();
+  if (formInput.value.length === 0) {
+    labelArr.forEach((element) => {
+      if (element.isPinned === false) {
+        allTask.insertAdjacentElement('beforeend', element.label);
+      }
+    });
+  }
   const findLab = labelArr.filter((el) => {
-    const value = e.target.value.toLowerCase();
-    return el.textContent.toLowerCase().indexOf(value) !== -1;
+    if (el.isPinned === false) {
+      const value = e.target.value.toLowerCase();
+      return el.label.textContent.toLowerCase().indexOf(value) !== -1;
+    }
+    return 0;
   });
   if (findLab.length) {
+    allTask.innerHTML = '';
     findLab.forEach((el) => {
-      allTask.innerHTML = '';
-      allTask.insertAdjacentElement('beforeend', el);
+      allTask.insertAdjacentElement('beforeend', el.label);
     });
   } else {
     allTask.innerHTML = '';
   }
-
-  if (formInput.value.length === 0) {
-    labelArr.forEach((element) => {
-      allTask.insertAdjacentElement('beforeend', element);
-    });
-  }
 });
 
 function pinned() {
-  const labelClick = document.querySelectorAll('input[name="task"]');
+  const labelClick = document.querySelectorAll('.typeRadio');
 
   labelClick.forEach((element) => {
     element.addEventListener('click', (e) => {
@@ -39,12 +43,22 @@ function pinned() {
         e.target.name = 'pin';
         pinnedTask.insertAdjacentElement('beforeend', element.closest('label'));
 
-        if (labelArr.indexOf(element.closest('label')) !== -1) {
-          labelArr.splice(labelArr.indexOf(element.closest('label')), 1);
-        }
+        labelArr.forEach((el) => {
+          const { label } = el;
+          if (label === e.target.closest('label')) {
+            el.isPinned = true;// eslint-disable-line no-param-reassign
+          }
+        });
       } else {
         e.target.name = 'task';
         allTask.insertAdjacentElement('beforeend', element.closest('label'));
+
+        labelArr.forEach((el) => {
+          const { label } = el;
+          if (label === e.target.closest('label')) {
+            el.isPinned = false;// eslint-disable-line no-param-reassign
+          }
+        });
         if (!document.querySelectorAll('input[name="pin"]').length) {
           noPin.style.display = 'block';
         }
@@ -63,9 +77,9 @@ form.addEventListener('submit', (e) => { // нажатие на enter
     element.classList.add('label-all');
     element.innerHTML = `${formInput.value}<input type="checkbox" class="typeRadio" name="task">`;
     allTask.insertAdjacentElement('beforeend', element);
-    labelArr.push(element);
+    labelArr.push({ label: element, isPinned: false });
     labelArr.forEach((el) => {
-      allTask.insertAdjacentElement('beforeend', el);
+      if (el.isPinned === false) allTask.insertAdjacentElement('beforeend', el.label);
     });
     pinned();
     form.reset();// очистка
